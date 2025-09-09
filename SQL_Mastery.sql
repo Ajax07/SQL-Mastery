@@ -353,3 +353,110 @@ select product_name,
 from products;
 
 
+/*Window function perform calculations across a set of 
+table rows related to the current row. They are useful for
+ranking, calculating running totals, percentages and much more.
+*/
+
+select * from products;
+-- assign unique row number to each product within the same category
+
+select product_name, category, price,
+	row_number() over (partition by category order by price desc) as row_number
+from products;
+
+select product_name, category, price, quantity,
+	dense_rank() over (partition by category order by price desc) as rank_number
+from products;
+
+select product_name, category, price, quantity,
+	sum(price) over (partition by category order by price desc) as sum_number
+from products;
+
+
+-- joins in sql inner, left, right, full, cross, self
+drop table  if exists employees3;
+create table employees3(
+	employee_id serial primary key,
+	first_name varchar(30),
+	last_name varchar(30),
+	department_id int
+);
+
+insert into employees3 (first_name, last_name, department_id)
+values
+('rahul', 'sharma', 101),
+('priya', 'mehta', 102),
+('vijay', 'sharma', 103),
+('ajay', 'sharma', NULL),
+('aman', 'sharma', 101);
+
+select * from employees3;
+drop table if exists departments;
+create table departments (
+	department_id int primary key,
+	department_name varchar(20)
+);
+
+insert into departments(department_id, department_name)
+values
+(101, 'sales'),
+(102, 'Marketing'),
+(103, 'IT'),
+(104, 'HR')
+
+--inner join
+select e.employee_id, e.first_name, 
+d.department_id, d.department_name
+from employees3 e
+inner join
+departments d
+on e.department_id=d.department_id;
+
+
+--left join
+select e.employee_id, e.first_name, 
+d.department_id, d.department_name
+from employees3 e
+left join
+departments d
+on e.department_id=d.department_id;
+
+--right join
+select e.employee_id, e.first_name, 
+d.department_id, d.department_name
+from employees3 e
+right join
+departments d
+on e.department_id=d.department_id;
+
+--full outer join
+select e.employee_id, e.first_name, 
+d.department_id, d.department_name
+from employees3 e
+full outer join
+departments d
+on e.department_id=d.department_id;
+
+--cross join all possible matches
+select e.employee_id, e.first_name, 
+d.department_id, d.department_name
+from employees3 e
+cross join
+departments d;
+
+--self join
+
+select e1.first_name as emp_name1,
+e2.first_name as emp_name2,
+d.department_name
+from employees3 e1 join employees3 e2
+on e1.department_id=e2.department_id 
+and  e1.employee_id != e2.employee_id
+join
+departments d
+on
+e1.department_id = d.department_id;
+
+
+
